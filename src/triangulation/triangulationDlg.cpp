@@ -6,6 +6,8 @@
 #include "triangulationDlg.h"
 #include "afxdialogex.h"
 
+#include "mesh_drawable.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -24,11 +26,13 @@ CTriangulationDlg::CTriangulationDlg(CWnd* pParent /*=NULL*/)
 void CTriangulationDlg::DoDataExchange(CDataExchange* pDX)
 {
     CSimulationDialog::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_PLOT, mPlotCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CTriangulationDlg, CSimulationDialog)
     ON_WM_PAINT()
     ON_WM_QUERYDRAGICON()
+    ON_BN_CLICKED(IDC_BUTTON1, &CTriangulationDlg::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -82,4 +86,12 @@ void CTriangulationDlg::OnPaint()
 HCURSOR CTriangulationDlg::OnQueryDragIcon()
 {
     return static_cast<HCURSOR>(m_hIcon);
+}
+
+
+void CTriangulationDlg::OnBnClickedButton1()
+{
+    UpdateData(TRUE);
+
+    StartSimulationThread();
 }

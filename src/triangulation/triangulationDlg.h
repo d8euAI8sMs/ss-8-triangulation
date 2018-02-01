@@ -4,6 +4,7 @@
 #pragma once
 
 #include <util/common/gui/SimulationDialog.h>
+#include <util/common/plot/PlotStatic.h>
 
 // CTriangulationDlg dialog
 class CTriangulationDlg : public CSimulationDialog
@@ -28,4 +29,7 @@ protected:
     afx_msg void OnPaint();
     afx_msg HCURSOR OnQueryDragIcon();
     DECLARE_MESSAGE_MAP()
+public:
+    afx_msg void OnBnClickedButton1();
+    PlotStatic mPlotCtrl;
 };
