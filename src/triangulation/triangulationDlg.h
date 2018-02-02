@@ -36,6 +36,7 @@ protected:
     DECLARE_MESSAGE_MAP()
 public:
     afx_msg void OnBnClickedButton1();
+    void OnSimulation();
     PlotStatic mPlotCtrl;
     util::ptr_t < plot::mesh > mMesh;
     plot::mesh_drawable :: ptr_t mPlot;

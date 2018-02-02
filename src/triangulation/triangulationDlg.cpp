@@ -186,6 +186,87 @@ void CTriangulationDlg::OnBnClickedButton1()
 }
 
 
+void CTriangulationDlg::OnSimulation()
+{
+    srand(clock() % UINT_MAX);
+
+    /* clear existing mesh */
+    *mMesh = plot::mesh();
+
+    std::vector < plot::point < double > > superstruct;
+    std::vector < plot::point < double > > points;
+
+    switch (mSelectedMesh)
+    {
+    case mesh_type_hex_in_hex:
+        superstruct.emplace_back(-1 * 6, 0);
+        superstruct.emplace_back(-0.5 * 6, std::sqrt(3) / 2 * 6);
+        superstruct.emplace_back(0.5 * 6, std::sqrt(3) / 2 * 6);
+        superstruct.emplace_back(1 * 6, 0);
+        superstruct.emplace_back(0.5 * 6, - std::sqrt(3) / 2 * 6);
+        superstruct.emplace_back(-0.5 * 6, - std::sqrt(3) / 2 * 6);
+        break;
+    default:
+        superstruct.emplace_back(-10, -10);
+        superstruct.emplace_back(10, 10);
+        superstruct.emplace_back(10, -10);
+        superstruct.emplace_back(-10, 10);
+        break;
+    }
+
+    switch (mSelectedMesh)
+    {
+    case mesh_type_random:
+        for (size_t i = 0; i < 100; ++i)
+        {
+            points.emplace_back((double)rand() / RAND_MAX * 16 - 8,
+                                (double)rand() / RAND_MAX * 16 - 8);
+        }
+        break;
+    case mesh_type_random_rect:
+        for (size_t i = 0; i < 100; ++i)
+        {
+            double r1 = ((double)rand() / RAND_MAX * 0.2 - 0.1) * i / 100.;
+            double r2 = ((double)rand() / RAND_MAX * 0.2 - 0.1) * i / 100.;
+            points.emplace_back((i / 10 + r1) - 4.5, (i % 10 + r2) - 4.5);
+        }
+        break;
+    case mesh_type_rect:
+        for (size_t i = 0; i < 100; ++i)
+        {
+            points.emplace_back(i / 10 - 4.5, i % 10 - 4.5);
+        }
+        break;
+    case mesh_type_square:
+        points.emplace_back(-5, -5);
+        points.emplace_back(5, 5);
+        points.emplace_back(5, -5);
+        points.emplace_back(-5, 5);
+        break;
+    case mesh_type_hex:
+    case mesh_type_hex_in_hex:
+        points.emplace_back(-1 * 3, 0);
+        points.emplace_back(-0.5 * 3, std::sqrt(3) / 2 * 3);
+        points.emplace_back(0.5 * 3, std::sqrt(3) / 2 * 3);
+        points.emplace_back(1 * 3, 0);
+        points.emplace_back(0.5 * 3, - std::sqrt(3) / 2 * 3);
+        points.emplace_back(-0.5 * 3, - std::sqrt(3) / 2 * 3);
+        break;
+    default:
+        break;
+    }
+
+    plot::init_mesh(*mMesh, superstruct);
+    plot::add_to_mesh(*mMesh, points);
+
+    mPlotCtrl.RedrawBuffer();
+    mPlotCtrl.SwapBuffers();
+    mPlotCtrl.RedrawWindow();
+
+    CSimulationDialog::OnSimulation();
+}
+
+
 void CTriangulationDlg::OnCbnSelchangeCombo1()
 {
     OnBnClickedButton1();
