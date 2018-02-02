@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 
 #include "mesh_drawable.h"
+#include "mesh.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -48,6 +49,52 @@ BOOL CTriangulationDlg::OnInitDialog()
     SetIcon(m_hIcon, FALSE);        // Set small icon
 
     // TODO: Add extra initialization here
+
+    mMesh = util::create < plot::mesh > ();
+
+    mWorld = plot::world_t::create(-11, 11, -11, 11);
+
+    mPlot = plot::mesh_drawable::create
+    (
+        plot::make_data_source(mMesh),
+        plot::custom_drawable::create
+        (
+            plot::circle_painter(5, plot::palette::brush(RGB(200, 200, 200)))
+        ),
+        plot::palette::pen(RGB(180, 180, 180))
+    );
+
+    auto root = plot::viewporter::create(
+        plot::tick_drawable::create(
+            plot::layer_drawable::create(
+                std::vector < plot::drawable::ptr_t > (
+                    { mPlot }
+                )
+            ),
+            plot::const_n_tick_factory<plot::axe::x>::create(
+                plot::make_simple_tick_formatter(2, 5),
+                0,
+                5
+            ),
+            plot::const_n_tick_factory<plot::axe::y>::create(
+                plot::make_simple_tick_formatter(2, 5),
+                0,
+                5
+            ),
+            plot::palette::pen(RGB(80, 80, 80)),
+            RGB(200, 200, 200)
+        ),
+        plot::make_viewport_mapper(mWorld)
+    );
+
+    mPlotCtrl.plot_layer.with(root);
+
+    mPlotCtrl.background = plot::palette::brush();
+    mPlotCtrl.triple_buffered = true;
+
+    mPlotCtrl.RedrawBuffer();
+    mPlotCtrl.SwapBuffers();
+    mPlotCtrl.RedrawWindow();
 
     return TRUE;  // return TRUE  unless you set the focus to a control
 }

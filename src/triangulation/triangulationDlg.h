@@ -5,6 +5,10 @@
 
 #include <util/common/gui/SimulationDialog.h>
 #include <util/common/plot/PlotStatic.h>
+#include <util/common/ptr.h>
+
+#include "mesh.h"
+#include "mesh_drawable.h"
 
 // CTriangulationDlg dialog
 class CTriangulationDlg : public CSimulationDialog
@@ -32,4 +36,7 @@ protected:
 public:
     afx_msg void OnBnClickedButton1();
     PlotStatic mPlotCtrl;
+    util::ptr_t < plot::mesh > mMesh;
+    plot::mesh_drawable :: ptr_t mPlot;
+    plot::world_t::ptr_t mWorld;
 };
