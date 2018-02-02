@@ -34,6 +34,11 @@ namespace plot
         bool super;
     };
 
+    struct dirichlet_cell
+    {
+        std::vector < size_t > path;
+    };
+
     struct mesh
     {
 
@@ -57,6 +62,9 @@ namespace plot
 
         /* the vector of neighbor triangles of the given vertex */
         std::vector < std::set < size_t > > neighbor_triangles;
+
+        /* the vector of Dirichlet cells of the given vertex */
+        std::vector < dirichlet_cell > dirichlet_cells;
     };
 
     inline static enclosing_circle get_enclosing_circle
@@ -455,6 +463,49 @@ namespace plot
         for (size_t i = 0; i < vertices.size(); ++i)
         {
             add_to_mesh(m, vertices[i]);
+        }
+    }
+
+    inline static void tessellate(mesh & m)
+    {
+        auto cmp = [] (const std::pair < double, size_t > & a,
+                       const std::pair < double, size_t > & b)
+        {
+             return a.first < b.first;
+        };
+
+        m.dirichlet_cells.resize(m.vertices.size());
+
+        for (size_t i = 0; i < m.vertices.size(); ++i)
+        {
+            auto & n = m.neighbor_triangles[i];
+
+            if (n.size() < 3)
+            {
+                m.dirichlet_cells[i].path.clear();
+                continue;
+            }
+
+            m.dirichlet_cells[i].path.resize(n.size());
+
+            std::vector < std::pair < double, size_t > > pts;
+
+            for (auto j = n.begin(); j != n.end(); ++j)
+            {
+                point < double > xy =
+                {
+                    m.triangle_infos[*j].enclosing.center.x - m.vertices[i].x,
+                    m.triangle_infos[*j].enclosing.center.y - m.vertices[i].y
+                };
+                pts.emplace_back(std::atan2(xy.y, xy.x), *j);
+            }
+
+            std::sort(pts.begin(), pts.end(), cmp);
+
+            for (size_t j = 0; j < pts.size(); ++j)
+            {
+                m.dirichlet_cells[i].path[j] = pts[j].second;
+            }
         }
     }
 }
