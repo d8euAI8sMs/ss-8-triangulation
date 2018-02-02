@@ -9,6 +9,7 @@
 
 #include "mesh.h"
 #include "mesh_drawable.h"
+#include "dirichlet_cell_drawable.h"
 #include "afxwin.h"
 
 // CTriangulationDlg dialog
@@ -40,6 +41,7 @@ public:
     PlotStatic mPlotCtrl;
     util::ptr_t < plot::mesh > mMesh;
     plot::mesh_drawable :: ptr_t mPlot;
+    plot::dirichlet_cell_drawable :: ptr_t mPlotDirichlet;
     plot::world_t::ptr_t mWorld;
     CComboBox mMeshSelectCtrl;
     afx_msg void OnCbnSelchangeCombo1();

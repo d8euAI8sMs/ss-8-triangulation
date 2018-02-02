@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 
 #include "mesh_drawable.h"
+#include "dirichlet_cell_drawable.h"
 #include "mesh.h"
 
 #ifdef _DEBUG
@@ -92,14 +93,24 @@ BOOL CTriangulationDlg::OnInitDialog()
         plot::palette::pen(RGB(180, 180, 180))
     );
 
+    mPlotDirichlet = plot::dirichlet_cell_drawable::create
+    (
+        plot::make_data_source(mMesh),
+        nullptr,
+        plot::palette::pen(RGB(255, 100, 100), 2)
+    );
+
     mPlot->superstructure_visible = (mbPaintSuperstructure != 0);
     mpPaintSuperstructure = &mPlot->superstructure_visible;
+
+    mPlotDirichlet->visible = (mbPaintDirichletCells != 0);
+    mpPaintDirichletCells = &mPlotDirichlet->visible;
 
     auto root = plot::viewporter::create(
         plot::tick_drawable::create(
             plot::layer_drawable::create(
                 std::vector < plot::drawable::ptr_t > (
-                    { mPlot }
+                    { mPlot, mPlotDirichlet }
                 )
             ),
             plot::const_n_tick_factory<plot::axe::x>::create(
@@ -258,6 +269,7 @@ void CTriangulationDlg::OnSimulation()
 
     plot::init_mesh(*mMesh, superstruct);
     plot::add_to_mesh(*mMesh, points);
+    plot::tessellate(*mMesh);
 
     mPlotCtrl.RedrawBuffer();
     mPlotCtrl.SwapBuffers();
@@ -275,6 +287,13 @@ void CTriangulationDlg::OnCbnSelchangeCombo1()
 
 void CTriangulationDlg::OnBnClickedCheck2()
 {
+    UpdateData(TRUE);
+
+    *mpPaintDirichletCells = (mbPaintDirichletCells != 0);
+
+    mPlotCtrl.RedrawBuffer();
+    mPlotCtrl.SwapBuffers();
+    mPlotCtrl.RedrawWindow();
 }
 
 
