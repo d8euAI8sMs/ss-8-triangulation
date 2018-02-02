@@ -9,6 +9,7 @@
 
 #include "mesh.h"
 #include "mesh_drawable.h"
+#include "afxwin.h"
 
 // CTriangulationDlg dialog
 class CTriangulationDlg : public CSimulationDialog
@@ -39,4 +40,13 @@ public:
     util::ptr_t < plot::mesh > mMesh;
     plot::mesh_drawable :: ptr_t mPlot;
     plot::world_t::ptr_t mWorld;
+    CComboBox mMeshSelectCtrl;
+    afx_msg void OnCbnSelchangeCombo1();
+    int mSelectedMesh;
+    BOOL mbPaintSuperstructure;
+    BOOL mbPaintDirichletCells;
+    bool * mpPaintSuperstructure;
+    bool * mpPaintDirichletCells;
+    afx_msg void OnBnClickedCheck2();
+    afx_msg void OnBnClickedCheck3();
 };

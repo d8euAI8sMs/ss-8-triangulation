@@ -16,10 +16,31 @@
 
 // CTriangulationDlg dialog
 
+enum mesh_type : size_t
+{
+    mesh_type_random,
+    mesh_type_random_rect,
+    mesh_type_rect,
+    mesh_type_square,
+    mesh_type_hex,
+    mesh_type_hex_in_hex
+};
 
+static const LPCTSTR mesh_type_names[] =
+{
+    _T("Random Mesh"),
+    _T("Random Mesh (Nearly Rectangular)"),
+    _T("Rectangular Mesh"),
+    _T("Square"),
+    _T("Hexagon"),
+    _T("Hexagon with Hexagonal Superstructure")
+};
 
 CTriangulationDlg::CTriangulationDlg(CWnd* pParent /*=NULL*/)
     : CSimulationDialog(CTriangulationDlg::IDD, pParent)
+    , mSelectedMesh(0)
+    , mbPaintSuperstructure(TRUE)
+    , mbPaintDirichletCells(FALSE)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -28,12 +49,19 @@ void CTriangulationDlg::DoDataExchange(CDataExchange* pDX)
 {
     CSimulationDialog::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_PLOT, mPlotCtrl);
+    DDX_Control(pDX, IDC_COMBO1, mMeshSelectCtrl);
+    DDX_CBIndex(pDX, IDC_COMBO1, mSelectedMesh);
+    DDX_Check(pDX, IDC_CHECK3, mbPaintSuperstructure);
+    DDX_Check(pDX, IDC_CHECK2, mbPaintDirichletCells);
 }
 
 BEGIN_MESSAGE_MAP(CTriangulationDlg, CSimulationDialog)
     ON_WM_PAINT()
     ON_WM_QUERYDRAGICON()
     ON_BN_CLICKED(IDC_BUTTON1, &CTriangulationDlg::OnBnClickedButton1)
+    ON_CBN_SELCHANGE(IDC_COMBO1, &CTriangulationDlg::OnCbnSelchangeCombo1)
+    ON_BN_CLICKED(IDC_CHECK2, &CTriangulationDlg::OnBnClickedCheck2)
+    ON_BN_CLICKED(IDC_CHECK3, &CTriangulationDlg::OnBnClickedCheck3)
 END_MESSAGE_MAP()
 
 
@@ -63,6 +91,9 @@ BOOL CTriangulationDlg::OnInitDialog()
         ),
         plot::palette::pen(RGB(180, 180, 180))
     );
+
+    mPlot->superstructure_visible = (mbPaintSuperstructure != 0);
+    mpPaintSuperstructure = &mPlot->superstructure_visible;
 
     auto root = plot::viewporter::create(
         plot::tick_drawable::create(
@@ -95,6 +126,17 @@ BOOL CTriangulationDlg::OnInitDialog()
     mPlotCtrl.RedrawBuffer();
     mPlotCtrl.SwapBuffers();
     mPlotCtrl.RedrawWindow();
+
+    mMeshSelectCtrl.AddString(mesh_type_names[mesh_type_random]);
+    mMeshSelectCtrl.AddString(mesh_type_names[mesh_type_random_rect]);
+    mMeshSelectCtrl.AddString(mesh_type_names[mesh_type_rect]);
+    mMeshSelectCtrl.AddString(mesh_type_names[mesh_type_square]);
+    mMeshSelectCtrl.AddString(mesh_type_names[mesh_type_hex]);
+    mMeshSelectCtrl.AddString(mesh_type_names[mesh_type_hex_in_hex]);
+
+    mMeshSelectCtrl.SetCurSel(0);
+
+    OnBnClickedButton1();
 
     return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -141,4 +183,27 @@ void CTriangulationDlg::OnBnClickedButton1()
     UpdateData(TRUE);
 
     StartSimulationThread();
+}
+
+
+void CTriangulationDlg::OnCbnSelchangeCombo1()
+{
+    OnBnClickedButton1();
+}
+
+
+void CTriangulationDlg::OnBnClickedCheck2()
+{
+}
+
+
+void CTriangulationDlg::OnBnClickedCheck3()
+{
+    UpdateData(TRUE);
+
+    *mpPaintSuperstructure = (mbPaintSuperstructure != 0);
+
+    mPlotCtrl.RedrawBuffer();
+    mPlotCtrl.SwapBuffers();
+    mPlotCtrl.RedrawWindow();
 }
