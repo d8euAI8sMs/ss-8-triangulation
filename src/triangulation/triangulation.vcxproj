@@ -110,6 +110,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="triangulation.h" />
     <ClInclude Include="triangulationDlg.h" />
+    <ClInclude Include="dirichlet_cell_drawable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
