@@ -130,7 +130,7 @@
     <Image Include="res\triangulation.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\util-cpp-common\util-cpp-common.vcxproj">
+    <ProjectReference Include="..\..\lib\util-cpp-common\src\util-cpp-common.vcxproj">
       <Project>{9e8371d6-eaab-42c2-b488-865a8216bdcc}</Project>
     </ProjectReference>
   </ItemGroup>
