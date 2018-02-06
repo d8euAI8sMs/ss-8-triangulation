@@ -4,12 +4,12 @@
 #pragma once
 
 #include <util/common/gui/SimulationDialog.h>
-#include <util/common/plot/PlotStatic.h>
+#include <util/common/gui/PlotControl.h>
 #include <util/common/ptr.h>
+#include <util/common/geom/mesh.h>
+#include <util/common/plot/triangulation_drawable.h>
+#include <util/common/plot/dirichlet_cell_drawable.h>
 
-#include "mesh.h"
-#include "mesh_drawable.h"
-#include "dirichlet_cell_drawable.h"
 #include "afxwin.h"
 
 // CTriangulationDlg dialog
@@ -38,9 +38,9 @@ protected:
 public:
     afx_msg void OnBnClickedButton1();
     void OnSimulation();
-    PlotStatic mPlotCtrl;
-    util::ptr_t < plot::mesh > mMesh;
-    plot::mesh_drawable :: ptr_t mPlot;
+    CPlotControl mPlotCtrl;
+    util::ptr_t < geom::mesh > mMesh;
+    plot::triangulation_drawable :: ptr_t mPlot;
     plot::dirichlet_cell_drawable :: ptr_t mPlotDirichlet;
     plot::world_t::ptr_t mWorld;
     CComboBox mMeshSelectCtrl;

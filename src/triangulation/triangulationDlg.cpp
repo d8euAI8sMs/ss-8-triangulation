@@ -6,10 +6,6 @@
 #include "triangulationDlg.h"
 #include "afxdialogex.h"
 
-#include "mesh_drawable.h"
-#include "dirichlet_cell_drawable.h"
-#include "mesh.h"
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -79,11 +75,11 @@ BOOL CTriangulationDlg::OnInitDialog()
 
     // TODO: Add extra initialization here
 
-    mMesh = util::create < plot::mesh > ();
+    mMesh = util::create < geom::mesh > ();
 
     mWorld = plot::world_t::create(-11, 11, -11, 11);
 
-    mPlot = plot::mesh_drawable::create
+    mPlot = plot::triangulation_drawable::create
     (
         plot::make_data_source(mMesh),
         plot::custom_drawable::create
@@ -202,7 +198,7 @@ void CTriangulationDlg::OnSimulation()
     srand(clock() % UINT_MAX);
 
     /* clear existing mesh */
-    *mMesh = plot::mesh();
+    mMesh->clear();
 
     std::vector < plot::point < double > > superstruct;
     std::vector < plot::point < double > > points;
@@ -267,9 +263,9 @@ void CTriangulationDlg::OnSimulation()
         break;
     }
 
-    plot::init_mesh(*mMesh, superstruct);
-    plot::add_to_mesh(*mMesh, points);
-    plot::tessellate(*mMesh);
+    mMesh->init(superstruct);
+    mMesh->add(points);
+    mMesh->finish_mesh();
 
     mPlotCtrl.RedrawBuffer();
     mPlotCtrl.SwapBuffers();
