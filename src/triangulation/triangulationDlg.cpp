@@ -13,6 +13,15 @@
 
 // CTriangulationDlg dialog
 
+static double angle_between(const geom::point2d_t & p0,
+                            const geom::point2d_t & p1,
+                            const geom::point2d_t & p2)
+{
+    auto v1 = p1 - p0;
+    auto v2 = p2 - p0;
+    return std::acos((v1.x * v2.x + v1.y * v2.y) / math::norm(v1) / math::norm(v2));
+}
+
 enum mesh_type : size_t
 {
     mesh_type_random,
@@ -50,6 +59,7 @@ void CTriangulationDlg::DoDataExchange(CDataExchange* pDX)
     DDX_CBIndex(pDX, IDC_COMBO1, mSelectedMesh);
     DDX_Check(pDX, IDC_CHECK3, mbPaintSuperstructure);
     DDX_Check(pDX, IDC_CHECK2, mbPaintDirichletCells);
+    DDX_Control(pDX, IDC_Comment, mComment);
 }
 
 BEGIN_MESSAGE_MAP(CTriangulationDlg, CSimulationDialog)
@@ -195,6 +205,8 @@ void CTriangulationDlg::OnBnClickedButton1()
 
 void CTriangulationDlg::OnSimulation()
 {
+    mComment.SetWindowText(_T(""));
+
     srand(clock() % UINT_MAX);
 
     /* clear existing mesh */
@@ -270,6 +282,43 @@ void CTriangulationDlg::OnSimulation()
     mPlotCtrl.RedrawBuffer();
     mPlotCtrl.SwapBuffers();
     mPlotCtrl.RedrawWindow();
+
+    const double threshold1_deg = 180 - 180 / 4.;
+    const double threshold2_deg = 180 - 180 / 8.;
+    const double threshold1 = threshold1_deg / 180 * M_PI;
+    const double threshold2 = threshold2_deg / 180 * M_PI;
+    size_t count1 = 0;
+    size_t count2 = 0;
+
+    for (size_t i = 0; i < mMesh->triangles().size(); ++i)
+    {
+        if (mMesh->triangles()[i].flags & geom::mesh::phantom) continue;
+        auto t = mMesh->triangle_at(i);
+        auto a1 = angle_between(t.points[0], t.points[1], t.points[2]);
+        auto a2 = angle_between(t.points[1], t.points[0], t.points[2]);
+        auto a3 = angle_between(t.points[2], t.points[1], t.points[0]);
+
+        if ((a1 > threshold1) || (a2 > threshold1) || (a3 > threshold1))
+        {
+            ++count1;
+        }
+        if ((a1 > threshold2) || (a2 > threshold2) || (a3 > threshold2))
+        {
+            ++count2;
+        }
+    }
+
+    CString fmt;
+    fmt.Format(_T("total %d points and %d triangles;    ")
+        _T("%d triangles have max angle > %.1lf deg;    ")
+        _T("%d triangles - > %.1lf deg"),
+        mMesh->vertices().size(),
+        mMesh->triangles().size(),
+        count1,
+        threshold1_deg,
+        count2,
+        threshold2_deg);
+    mComment.SetWindowText(fmt);
 
     CSimulationDialog::OnSimulation();
 }

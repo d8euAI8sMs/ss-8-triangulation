@@ -52,4 +52,5 @@ public:
     bool * mpPaintDirichletCells;
     afx_msg void OnBnClickedCheck2();
     afx_msg void OnBnClickedCheck3();
+    CStatic mComment;
 };
