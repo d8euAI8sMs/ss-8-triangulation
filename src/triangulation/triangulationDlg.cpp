@@ -290,6 +290,9 @@ void CTriangulationDlg::OnSimulation()
     size_t count1 = 0;
     size_t count2 = 0;
 
+    double measure = 0;
+    size_t live_triangle_count = 0;
+
     for (size_t i = 0; i < mMesh->triangles().size(); ++i)
     {
         if (mMesh->triangles()[i].flags & geom::mesh::phantom) continue;
@@ -306,18 +309,26 @@ void CTriangulationDlg::OnSimulation()
         {
             ++count2;
         }
+        if (mMesh->triangles()[i].flags & geom::mesh::superstruct) continue;
+        measure += min(a1, min(a2, a3));
+        ++live_triangle_count;
     }
+
+    measure /= M_PI / 3;
+    measure /= live_triangle_count;
 
     CString fmt;
     fmt.Format(_T("total %d points and %d triangles;    ")
         _T("%d triangles have max angle > %.1lf deg;    ")
-        _T("%d triangles - > %.1lf deg"),
+        _T("%d triangles > %.1lf deg;    ")
+        _T("total 'quality' is %.1lf%%"),
         mMesh->vertices().size(),
         mMesh->triangles().size(),
         count1,
         threshold1_deg,
         count2,
-        threshold2_deg);
+        threshold2_deg,
+        measure * 100);
     mComment.SetWindowText(fmt);
 
     CSimulationDialog::OnSimulation();
